@@ -1,0 +1,24 @@
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+
+dotenv.config();
+export let verifyAuth = (req, res, next)=>{
+    try {
+        let authHeader = req.headers.authorization;
+
+        if(!authHeader){
+            return res.status(404).json({message: "No Token Provided"});
+        }
+
+        let token = authHeader.split(" ")[1];
+
+        let decoded = jwt.verify(token,process.env.JWT_Secret);
+
+        req.user = decoded;
+
+        next();
+    } catch (error) {
+        res.status(500).json({message: "token expired, login again"});
+        console.log(error.message)
+    }
+}
